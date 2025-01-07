@@ -5,15 +5,17 @@ from time import sleep
 import google.generativeai as genai
 
 class IA():
-    def __init__(self, key: str, model : str = 'gemini-1.5-flash',):
+    def __init__(self, key: str, model : str = 'gemini-1.5-flash', nomeIA : str = 'IA'):
         """
         Classe para configurar e iniciar a IA usando a API do GEMINI.
 
         :param key: Chave da API do GEMINI.
         :param model: Modelo de IA a ser usado (padrão: 'gemini-1.5-flash').  
+        :param nome: Nomeia a IA 
         """
 
         self.key = key  
+        self.nomeIA = nomeIA
         
         # CONFIGURAÇÕES DA IA GEMINI
         genai.configure(api_key=key)
@@ -21,7 +23,7 @@ class IA():
         
         # TESTA PARA VER SE A KEY E MODEL FORAM PASSADOS CORRETAMENTE
         try:
-            response = self.model.generate_content("Escreva apenas 'Ok, IA iniciada!' se tudo estiver funcionando!")
+            response = self.model.generate_content(f"Escreva apenas 'Ok, {nomeIA} iniciada!' se tudo estiver funcionando!")
             print(response.text)
         except Exception as e:
             print(e)
@@ -54,7 +56,7 @@ class IA():
         self.chat.send_message(roteiro)
 
 
-    def chatBotAdvanced(self, input : str = '', printResponse : bool = False):
+    def chatBotAdvanced(self, input : str = '', printResponse : bool = False, nomeIA : bool = False):
         """
         Inicia uma conversa com o chatBot que mantém histórico
 
@@ -67,9 +69,12 @@ class IA():
 
         # DEFINE SE A FUNÇÃO RETORNARÁ O TEXTO OU IMPRIMIRÁ NO TERMINAL
         if printResponse == True:
-            print(response.text)
-        else:
-            return(response.text)
+            if nomeIA == True:
+                print(self.nomeIA + " - " + response.text)
+            else:
+                print(response.text)
+
+        return(response.text)
         
     
     def audio_image_txt(self, pathAudio: str = '', printResponse : bool = False):
@@ -88,11 +93,31 @@ class IA():
         arquivo.delete()
 
 if __name__ == "__main__":
-    ia = IA(key=key)
+    #inicia a IA como objeto
+    sasuke = IA(key=key, nomeIA='Sasuke')
+    naruto = IA(key=key, nomeIA='Naruto')
     
-    # ia.roteiroChatBotAdvanced(roteiro= 'Seja um italiano com sotaque e mal educado, puxe assunto comigo, tenha resposta de no max 20 palavras',)
+    #Bot sasuke
+    sasuke.roteiroChatBotAdvanced(roteiro='Você é o Sasuke Uchiha de Naruto Shippuden, responda de forma agressiva e provocativa. maximo de 35 palavras')
 
-    # ia.chatBotAdvanced(input='É verdade que você é o naruto? eu sou o Sasuke?',
-    #             printResponse=True)
-   
-    ia.audio_image_txt(pathAudio='image.png', printResponse=True)
+    #Bot naruto
+    naruto.roteiroChatBotAdvanced(roteiro='Você é o Naruto Uzumaki de Naruto Shippuden, responda de forma agressiva e provocativa. maximo de 35 palavras')
+
+    #Texto mensagem inicial
+    primeiraMsg = 'Sou o Sasuke, quem é você?'
+
+    #Mensagem inicial
+    respostaNaruto = naruto.chatBotAdvanced(input=primeiraMsg, printResponse=True, nomeIA=True)
+
+    respostaSasuke = ''
+
+    while True:
+        
+        #Sasuke
+        sleep(4)
+        respostaSasuke = sasuke.chatBotAdvanced(input=respostaNaruto, printResponse=True, nomeIA=True)
+
+        #Naruto
+        sleep(4)
+        respostaNaruto = naruto.chatBotAdvanced(input=respostaSasuke, printResponse=True, nomeIA=True)
+ 
